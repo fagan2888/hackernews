@@ -1,5 +1,10 @@
 {% extends "bootstrap/base.html" %}
 
+{% block head %}
+    {{super()}}
+    <link rel="stylesheet" href="/static/css/main.css">
+{% endblock %}
+
 {% block scripts %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
@@ -10,9 +15,9 @@
                     '{{color}}',
                 {% endfor %}
             ];
-            var categories = [
-                {% for category in statistics.categories %}
-                    '{{category.0.strftime("%H")}}',
+            var time_intervals = [
+                {% for interval in statistics.time_intervals %}
+                    '{{interval.0.strftime("%H")}}',
                 {% endfor %}
             ];
 
@@ -25,7 +30,7 @@
                     x: -20 //center
                 },
                 xAxis: {
-                    categories: categories
+                    categories: time_intervals
                 },
                 yAxis: {
                     title: {
@@ -45,27 +50,15 @@
                     borderWidth: 0
                 },
                 colors: colors,
-                series: [{
-                    name: 'machinelearning',
-                    data: {{statistics.data.machinelearning}},
-                    visible: {% if category == 'all' or category == 'machinelearning' %} true {% else %} false {% endif %}
-                }, {
-                    name: 'programming',
-                    data: {{statistics.data.programming}},
-                    visible: {% if category == 'all' or category == 'programming' %} true {% else %} false {% endif %}
-                }, {
-                    name: 'startups',
-                    data: {{statistics.data.startups}},
-                    visible: {% if category == 'all' or category == 'startups' %} true {% else %} false {% endif %}
-                }, {
-                    name: 'worldnews',
-                    data: {{statistics.data.worldnews}},
-                    visible: {% if category == 'all' or category == 'worldnews' %} true {% else %} false {% endif %}
-                }, {
-                    name: 'other',
-                    data: {{statistics.data.other}},
-                    visible: {% if category == 'all' or category == 'other' %} true {% else %} false {% endif %}
-                }]
+                series: [
+                {% for cat in categories %}
+                    {
+                        name: '{{cat}}',
+                        data: {{statistics.data[cat]}},
+                        visible: {% if category == 'all' or category == cat %} true {% else %} false {% endif %}
+                    },
+                    {% endfor %}
+                ]
             });
         });            
     </script>
@@ -73,36 +66,15 @@
 
 {% block navbar %}
     <!-- Navigation -->
-    <nav class="container  navbar-inverse navbar-fixed-top" role="navigation" 
-         style="background-color: rgb(255, 102, 0); 
-                border-color: rgb(192, 77, 0);
-                height: 30px;
-                margin-top: 10px;">
-        <div class="navbar-header" style="margin-top: -12px">
-            <a class="navbar-brand" href="/" style="color: black; font-size: 15px;">
-                <div style="
-                    background: url('/static/images/logo.png') repeat scroll 0% 0% / contain transparent;
-                    position: relative;
-                    width: 25px;
-                    height: 25px;
-                    display: inline-block;
-                    margin-left: -20px;"> </div>
-                <div style="
-                    font-size: 17px;
-                    position: relative;
-                    top: -5px;
-                    display: inline-block;
-                    font-weight: 500;"> 
-                    Hackernews 
-                    <small> by Monkeylearn </small>
+    <nav class="container navbar-inverse navbar-fixed-top header-container" role="navigation">
+        <div class="navbar-header header">
+            <a class="navbar-brand title" href="/">
+                <div class="logo"></div>
+                <div class="text"> 
+                    Hackernews <small> by Monkeylearn </small>
                 </div>
             </a>
         </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav"></ul>
-        </div>
-        <!-- /.navbar-collapse -->
-        <!-- /.container -->
     </nav>
 {% endblock %}
 
@@ -113,45 +85,44 @@
             <div class="col-lg-12">
                 <div id="chart"></div>
 
-                <div style="font-size: 20px; margin-bottom: 20px; margin-top: 20px; border-bottom: 1px solid rgb(204, 204, 204);"> 
-                    Top news
-                    <div class="pull-right">
-                        {% for label in labels %}
-                            <a href="/news?c={{label}}" style="font-size: 12px"> {{label}} | </a>
-                        {% endfor %}
-                        <a href="/news?c=all" style="font-size: 12px"> all </a>
-                    </div>
-                 </div>
-
-                {% for post in posts %}
-                    <div>
-                        <a href="{{post.url}}" > {{post.title}} </a>
+                <div class="list-container"> 
+                    <div class="header"> 
+                        Top news
                         <div class="pull-right">
-                            <span class="label label-primary"
-                                {% if post.result.label == 'machinelearning' %} 
-                                    style="background-color:{{statistics.colors.0}}"
-                                {% elif post.result.label == 'programming'%}
-                                    style="background-color:{{statistics.colors.1}}"
-                                {% elif post.result.label == 'startups' %}
-                                    style="background-color:{{statistics.colors.2}}"
-                                {% elif post.result.label == 'worldnews' %}
-                                    style="background-color:{{statistics.colors.3}}"
-                                {% else %}
-                                    style="background-color:{{statistics.colors.4}}"
-                                {% endif %}> 
-                                {{post.result.label}} ({{post.result.probability}})
-                            </span>
-                        </div>
-                        <p>
-                            <small> 
-                                {{post.score}} points by {{post.username}} 
-                                <a href="https://news.ycombinator.com/item?id={{post.id}}" target="_blank">
-                                    {{post.comments}} comments 
+                            {% for category in categories %}
+                                <a class="category" href="/news?c={{category}}">{{category}} | 
                                 </a>
-                            </small>
-                        </p>
+                            {% endfor %}
+                            <a class="category" href="/news?c=all" style="font-size: 12px"> all </a>
+                        </div>
+                     </div>
+                    <div class="list">
+                        {% for post in posts %}
+                            <div class="item">
+                                <a href="{{post.url}}" > {{post.title}} </a>
+                                <div class="pull-right">
+                                    <span class="label label-primary"
+                                        {% for category in categories %}
+                                            {% if post.result.label == category %} 
+                                                style="background-color:{{statistics.colors[loop.index0]}}"
+                                            {% endif %}
+                                        {% endfor %}> 
+                                        {{post.result.label}} ({{post.result.probability}})
+                                    </span>
+                                </div>
+                                <p>
+                                    <small> 
+                                        {{post.score}} points by {{post.username}} 
+                                        <a href="https://news.ycombinator.com/item?id={{post.id}}" target="_blank">
+                                            {{post.comments}} comments 
+                                        </a>
+                                    </small>
+                                </p>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
+
                 <a href="/news?p={{page+1}}&c={{category}}" style="margin-top: 10px; padding-bottom: 10px"> More </a>
             </div>
         </div>
