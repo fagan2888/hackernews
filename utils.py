@@ -3,10 +3,12 @@ import requests
 from lxml import html
 
 CATEGORIES = [
-    'machinelearning',
-    'startups',
     'programming',
-    'worldnews'
+    'business',
+    'design',
+    'entertaiment',
+    'science',
+    'security'
 ]
 
 
