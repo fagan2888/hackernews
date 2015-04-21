@@ -6,6 +6,35 @@ from utils import get_link_content, CATEGORIES
 OUTPUTF = 'samples.csv'
 LIMIT = 300
 
+REDDIT_CATEGORIES = [
+    ('programming', 'machinelearning', 100),
+    ('programming', 'computerscience', 100),
+    ('programming', 'programming', 100),
+    ('programming', 'learnprogramming', 100),
+
+    ('business', 'Entrepreneur', 150),
+    ('business', 'startups', 150),
+    ('business', 'business', 150),
+
+    ('design', 'web_design', 200),
+    ('design', 'graphic_design', 200),
+
+    ('entertaiment', 'Music', 100),
+    ('entertaiment', 'movies', 100),
+    ('entertaiment', 'books', 100),
+    ('entertaiment', 'television', 100),
+
+    ('science', 'science', 100),
+    ('science', 'Physics', 100),
+    ('science', 'chemistry', 100),
+    ('science', 'biology', 100),
+    ('science', 'math', 100),
+
+    ('security', 'networking', 150),
+    ('security', 'hacking', 150),
+    ('security', 'ComputerSecurity', 150),
+]
+
 
 reddit = praw.Reddit(user_agent='my_cool_application')
 
