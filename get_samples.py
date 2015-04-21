@@ -1,10 +1,10 @@
 import csv
 import praw
+import threading
 
-from utils import get_link_content, CATEGORIES
+from utils import get_link_content
 
 OUTPUTF = 'samples.csv'
-LIMIT = 300
 
 REDDIT_CATEGORIES = [
     ('programming', 'machinelearning', 100),
@@ -39,11 +39,11 @@ REDDIT_CATEGORIES = [
 reddit = praw.Reddit(user_agent='my_cool_application')
 
 
-def get_subreddit_tops(category):
+def get_subreddit_tops(category, limit=100):
     """
     Fectch subreddit top posts from Reddit's API
     """
-    return reddit.get_subreddit(category).get_hot(limit=LIMIT)
+    return reddit.get_subreddit(category).get_hot(limit=limit)
 
 
 def save_samples(samples):
@@ -56,26 +56,46 @@ def save_samples(samples):
             ])
 
 
-def main():
+def get_subreddit_samples(category, subreddit, limit, samples):
+    # Get subreddit top posts
+    subbreddit_top_posts = get_subreddit_tops(subreddit, limit)
+    # Get sample from each post's url
+    for post in subbreddit_top_posts:
+        print(subreddit + ': ' + post.url)
+        # If it's a self related post then take selftext as content
+        if post.is_self:
+            content = post.selftext
+        else:
+            content = get_link_content(post.url)
+        if content:
+            samples.append({
+                'text': content,
+                'label': category
+            })
+
+
+def get_reddit_samples():
     samples = []
-    for category in CATEGORIES:
-        # Get subreddit top posts
-        subbreddit_top_posts = get_subreddit_tops(category)
-        # Get sample from each post's url
-        for post in subbreddit_top_posts:
-            print(post.url)
-            # If it's a self related post then take selftext as content
-            if post.is_self:
-                content = post.selftext
-            else:
-                content = get_link_content(post.url)
-            if content:
-                samples.append({
-                    'text': content,
-                    'label': category
-                })
+    threads = []
+    for category, subreddit, limit in REDDIT_CATEGORIES:
+        t = threading.Thread(
+            target=get_subreddit_samples,
+            args=(category, subreddit, limit, samples,)
+        )
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
+
+    return samples
+
+
+def main():
+    reddit_samples = get_reddit_samples()
+
     # Generate .csv file
-    save_samples(samples)
+    save_samples(reddit_samples)
 
 
 if __name__ == '__main__':
