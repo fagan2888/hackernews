@@ -72,29 +72,55 @@ def get_hn_post(postId):
     return result
 
 
-def get_unclassified_posts(posts_chunk, unclassified_hn_posts):
-    for postId in posts_chunk:
+def update_post(old_post, new_post, ranking):
+    update = {'$set': {}}
+    # Update ranking position
+    if old_post['ranking'] != ranking:
+        update['$set']['ranking'] = ranking
+        # Update ranking of posts that had this position previously
+        posts.update({'ranking': ranking}, {'$set': {'ranking': None}})
+
+    # Update post comments count
+    if hasattr(new_post, 'descendants')\
+       and old_post['ranking'] != new_post.descendants:
+        update['$set']['comments'] = new_post.descendants
+
+    # Update post score
+    if old_post['score'] != new_post.score:
+        update['$set']['score'] = new_post.score
+
+    if update['$set']:
+        print('Updated: ' + old_post['url'])
+        posts.update({'id': old_post['id']}, update)
+
+
+def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
+    for i, postId in enumerate(posts_chunk):
+        ranking = chunk_number * 20 + (i + 1)
         # Check if post was already classified
-        post = posts.find_one({'id': postId})
-        if not post:
-            post = get_hn_post(postId)
-            if post and hasattr(post, 'url'):
-                text = get_link_content(post.url)
+        old_post = posts.find_one({'id': postId})
+        new_post = get_hn_post(postId)
+        if not old_post:
+            if new_post and hasattr(new_post, 'url'):
+                text = get_link_content(new_post.url)
                 if text:
-                    print(post.url)
+                    print(new_post.url)
                     post_data = {
                         'id': postId,
-                        'url': post.url,
-                        'title': post.title,
+                        'url': new_post.url,
+                        'title': new_post.title,
                         'text': text,
-                        'time': post.time,
-                        'score': post.score,
-                        'username': post.by,
+                        'time': new_post.time,
+                        'score': new_post.score,
+                        'username': new_post.by,
+                        'ranking': ranking
                     }
-                    if hasattr(post, 'descendants'):
-                        post_data['comments'] = post.descendants
+                    if hasattr(new_post, 'descendants'):
+                        post_data['comments'] = new_post.descendants
 
                     unclassified_hn_posts.append(post_data)
+        else:
+            update_post(old_post, new_post, ranking)
 
 
 def classify_hn_top_posts():
