@@ -1,6 +1,7 @@
 import datetime
 import json
 import requests
+import threading
 
 from firebase import firebase
 from flask import Flask, render_template, request
@@ -66,18 +67,16 @@ def get_hn_post(postId):
     return result
 
 
-def classify_hn_top_posts(response):
-    unclassified_hn_posts = []
-    for postId in response:
+def get_unclassified_posts(posts_chunk, unclassified_hn_posts):
+    for postId in posts_chunk:
         # Check if post was already classified
         post = posts.find_one({'id': postId})
         if not post:
             post = get_hn_post(postId)
-            if post and post.url:
-                print(postId)
-                print(post.url)
+            if post and hasattr(post, 'url'):
                 text = get_link_content(post.url)
                 if text:
+                    print(post.url)
                     post_data = {
                         'id': postId,
                         'url': post.url,
@@ -85,12 +84,35 @@ def classify_hn_top_posts(response):
                         'text': text,
                         'time': post.time,
                         'score': post.score,
-                        'username': post.by
+                        'username': post.by,
                     }
-                    if 'descendants' in post_data:
+                    if hasattr(post, 'descendants'):
                         post_data['comments'] = post.descendants
 
                     unclassified_hn_posts.append(post_data)
+
+
+def classify_hn_top_posts():
+    response = firebase.get('/v0/topstories', None)
+    unclassified_hn_posts = []
+
+    # Split response in list of 50 elements
+    chunks = [
+        response[i:i+20]
+        for i in xrange(0, len(response), 20)
+    ]
+    threads = []
+    for chunk in chunks:
+        t = threading.Thread(
+            target=get_unclassified_posts,
+            args=(chunk, unclassified_hn_posts,)
+        )
+        threads.append(t)
+        t.start()
+
+    # Wait until every chunk was processed
+    for t in threads:
+        t.join()
 
     # Classify posts
     result = classify([p['text'] for p in unclassified_hn_posts])
