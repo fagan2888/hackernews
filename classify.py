@@ -176,6 +176,8 @@ t = threading.Thread(target=classify_hn_top_posts,).start()
 
 def get_statistics():
     data = {}
+
+    # Generate time intervals used to filter posts
     now = datetime.datetime.now()
     time_intervals = [(
         (now-datetime.timedelta(hours=i)).replace(
@@ -187,6 +189,8 @@ def get_statistics():
             second=0,
             microsecond=0))
         for i in reversed(range(10))]
+
+    # Get posts count for each category in the time intervals defined
     for start, end in time_intervals:
         for category in CATEGORIES + ['random']:
             if category not in data:
