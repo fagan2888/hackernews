@@ -60,11 +60,9 @@ def save_samples(samples):
             ])
 
 
-def get_subreddit_samples(category, subreddit, limit, samples):
-    # Get subreddit top posts
-    subbreddit_top_posts = get_subreddit_tops(subreddit, limit)
+def get_subreddit_samples(category, subreddit, posts_chunk, samples):
     # Get sample from each post's url
-    for post in subbreddit_top_posts:
+    for post in posts_chunk:
         print(subreddit + ': ' + post.url)
         # If it's a self related post then take selftext as content
         if post.is_self:
@@ -82,12 +80,19 @@ def get_reddit_samples():
     samples = []
     threads = []
     for category, subreddit, limit in REDDIT_CATEGORIES:
-        t = threading.Thread(
-            target=get_subreddit_samples,
-            args=(category, subreddit, limit, samples,)
-        )
-        threads.append(t)
-        t.start()
+        # Get subreddit top posts
+        subbreddit_top_posts = list(get_subreddit_tops(subreddit, limit))
+        chunks = [
+            subbreddit_top_posts[i:i+50]
+            for i in xrange(0, len(subbreddit_top_posts), 50)
+        ]
+        for chunk in chunks:
+            t = threading.Thread(
+                target=get_subreddit_samples,
+                args=(category, subreddit, chunk, samples,)
+            )
+            threads.append(t)
+            t.start()
 
     for t in threads:
         t.join()
