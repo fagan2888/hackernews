@@ -210,7 +210,7 @@ def index():
     page = request.args.get('p')
     category = request.args.get('c')
 
-    selector = {}
+    selector = {'ranking': {'$ne': None}}
     if category and category != 'all':
         selector['result.label'] = category
     else:
@@ -223,7 +223,7 @@ def index():
 
     return render_template(
         'index.html',
-        posts=posts.find(selector).sort('time', -1)
+        posts=posts.find(selector).sort('ranking', 1)
                    .skip((page-1)*LIMIT).limit(LIMIT),
         statistics=get_statistics(),
         categories=CATEGORIES + ['random'],
