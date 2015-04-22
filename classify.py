@@ -17,7 +17,10 @@ PORT = 6000
 DEBUG = True
 LIMIT = 30
 MAX_RETRIES = 5
-COLORS = ['#D93B3B', '#7cb5ec', '#90ed7d', '#f7a35c', '#8085e9']
+COLORS = [
+    '#D93B3B', '#7cb5ec', '#90ed7d', '#f7a35c',
+    '#8085e9', '#c015e9', '#a015e9'
+]
 
 app = Flask(__name__)
 Bootstrap(app)
