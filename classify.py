@@ -157,7 +157,7 @@ def get_statistics():
             minute=0,
             second=0,
             microsecond=0))
-        for i in reversed(range(5))]
+        for i in reversed(range(10))]
     for start, end in time_intervals:
         for category in CATEGORIES + ['other']:
             if category not in data:
@@ -172,7 +172,7 @@ def get_statistics():
 
     return {
         'data': data,
-        'categories': time_intervals,
+        'time_intervals': time_intervals,
         'colors': COLORS
     }
 
