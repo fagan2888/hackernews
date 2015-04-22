@@ -5,6 +5,7 @@ import threading
 
 from firebase import firebase
 from flask import Flask, render_template, request
+from flask.ext.moment import Moment
 from flask_bootstrap import Bootstrap
 from hackernews import HackerNews
 from pymongo import MongoClient
@@ -20,6 +21,7 @@ COLORS = ['#D93B3B', '#7cb5ec', '#90ed7d', '#f7a35c', '#8085e9']
 
 app = Flask(__name__)
 Bootstrap(app)
+moment = Moment(app)
 
 hn = HackerNews()
 
