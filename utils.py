@@ -8,7 +8,8 @@ CATEGORIES = [
     'design',
     'entertaiment',
     'science',
-    'security'
+    'security',
+    'wordlnews'
 ]
 
 
