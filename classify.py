@@ -133,12 +133,11 @@ def classify_hn_top_posts():
             # Save classified post
             posts.insert(post)
 
+    # Classify new HN posts again in 5 minutes
+    threading.Timer(300, classify_hn_top_posts).start()
 
-firebase.get_async(
-    '/v0/topstories',
-    None,
-    callback=classify_hn_top_posts
-)
+# Start classifing HN post in 10 seconds
+threading.Timer(10, classify_hn_top_posts).start()
 
 
 def get_statistics():
