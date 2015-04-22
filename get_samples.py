@@ -7,22 +7,22 @@ from utils import get_link_content
 OUTPUTF = 'samples.csv'
 
 REDDIT_CATEGORIES = [
-    ('programming', 'machinelearning', 100),
-    ('programming', 'computerscience', 100),
-    ('programming', 'programming', 100),
-    ('programming', 'learnprogramming', 100),
+    ('programming', 'machinelearning', 150),
+    ('programming', 'computerscience', 250),
+    ('programming', 'programming', 150),
+    ('programming', 'learnprogramming', 150),
 
-    ('business', 'Entrepreneur', 150),
-    ('business', 'startups', 150),
-    ('business', 'business', 150),
+    ('business', 'Entrepreneur', 200),
+    ('business', 'startups', 200),
+    ('business', 'business', 200),
 
-    ('design', 'web_design', 200),
-    ('design', 'graphic_design', 200),
+    ('design', 'web_design', 300),
+    ('design', 'graphic_design', 300),
 
-    ('entertaiment', 'Music', 100),
-    ('entertaiment', 'movies', 100),
-    ('entertaiment', 'books', 100),
-    ('entertaiment', 'television', 100),
+    ('entertaiment', 'Music', 150),
+    ('entertaiment', 'movies', 150),
+    ('entertaiment', 'books', 150),
+    ('entertaiment', 'television', 150),
 
     ('science', 'science', 100),
     ('science', 'Physics', 100),
@@ -30,9 +30,13 @@ REDDIT_CATEGORIES = [
     ('science', 'biology', 100),
     ('science', 'math', 100),
 
-    ('security', 'networking', 150),
-    ('security', 'hacking', 150),
-    ('security', 'ComputerSecurity', 150),
+    ('security', 'networking', 200),
+    ('security', 'hacking', 200),
+    ('security', 'ComputerSecurity', 200),
+
+    ('worldnews', 'worldnews', 200),
+    ('worldnews', 'news', 200),
+    ('worldnews', 'TrueNews', 200),
 ]
 
 
