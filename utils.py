@@ -9,7 +9,7 @@ CATEGORIES = [
     'entertaiment',
     'science',
     'security',
-    'wordlnews'
+    'worldnews'
 ]
 
 
