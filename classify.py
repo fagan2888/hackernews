@@ -168,8 +168,8 @@ def classify_hn_top_posts():
     # Classify new HN posts again in 5 minutes
     threading.Timer(300, classify_hn_top_posts).start()
 
-# Start classifing HN post in 10 seconds
-threading.Timer(10, classify_hn_top_posts).start()
+# Start classifing HN post
+t = threading.Thread(target=classify_hn_top_posts,).start()
 
 
 def get_statistics():
