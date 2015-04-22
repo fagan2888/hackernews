@@ -154,9 +154,10 @@ def classify_hn_top_posts():
             post['result'] = result[i][0]
         else:
             post['result'] = {
-                'label': 'other',
+                'label': 'random',
                 'probability': '--'
             }
+            post['original_result'] = result[i][0]
 
         # Check if post was already classified
         old_post = posts.find_one({'id': post['id']})
