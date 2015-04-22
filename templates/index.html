@@ -103,13 +103,16 @@
                             <div class="item">
                                 <a href="{{post.url}}" > {{post.title}} </a>
                                 <div class="category">
-                                    <span class="label label-primary"
-                                        {% for category in categories %}
-                                            {% if post.result.label == category %} 
+                                    <span class="label label-primary" data-toggle="modal" data-target="#{{post.id}}"
+                                        {% for c in categories %}
+                                            {% if post.result.label == c %} 
                                                 style="background-color:{{statistics.colors[loop.index0]}}"
                                             {% endif %}
                                         {% endfor %}> 
-                                        {{post.result.label}} ({{post.result.probability}})
+                                        {{post.result.label}} 
+                                        {% if post.result.label != 'random' %}
+                                            ({{post.result.probability}})
+                                        {% endif %}
                                     </span>
                                 </div>
                                 <p>
@@ -122,6 +125,45 @@
                                         </a>
                                     </small>
                                 </p>
+                                
+                                <!-- Modal -->
+                                <div class="modal fade" id="{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                            Extracted text
+                                            {% if post.result.label == 'random' %}
+                                                <span class="label label-primary"
+                                                    {% for c in categories %}
+                                                        {% if post.original_result.label == c %} 
+                                                            style="background-color:{{statistics.colors[loop.index0]}}"
+                                                        {% endif %}
+                                                    {% endfor %}> 
+                                                    {{post.original_result.label}} ({{post.original_result.probability}})
+                                                </span>
+                                            {% else %}
+                                                <span class="label label-primary"
+                                                    {% for c in categories %}
+                                                        {% if post.result.label == c %} 
+                                                            style="background-color:{{statistics.colors[loop.index0]}}"
+                                                        {% endif %}
+                                                    {% endfor %}> 
+                                                    {{post.result.label}} ({{post.result.probability}})
+                                                </span>
+                                            {% endif %}
+                                        </h4>
+                                      </div>
+                                      <div class="modal-body">
+                                        {{post.text}}
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
