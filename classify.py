@@ -185,7 +185,7 @@ def get_statistics():
             microsecond=0))
         for i in reversed(range(10))]
     for start, end in time_intervals:
-        for category in CATEGORIES + ['other']:
+        for category in CATEGORIES + ['random']:
             if category not in data:
                 data[category] = []
             data[category].append(posts.find({
@@ -225,7 +225,7 @@ def index():
         posts=posts.find(selector).sort('time', -1)
                    .skip((page-1)*LIMIT).limit(LIMIT),
         statistics=get_statistics(),
-        categories=CATEGORIES + ['other'],
+        categories=CATEGORIES + ['random'],
         page=page,
         category=category
     )
