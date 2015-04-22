@@ -199,7 +199,7 @@ def index():
         posts=posts.find(selector).sort('time', -1)
                    .skip((page-1)*LIMIT).limit(LIMIT),
         statistics=get_statistics(),
-        labels=CATEGORIES + ['other'],
+        categories=CATEGORIES + ['other'],
         page=page,
         category=category
     )
