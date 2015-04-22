@@ -91,8 +91,8 @@
                     <div class="header"> 
                         Top news
                         <div class="pull-right">
-                            {% for category in categories %}
-                                <a class="category" href="/news?c={{category}}">{{category}} | 
+                            {% for c in categories %}
+                                <a class="category" href="/news?c={{c}}">{{c}} | 
                                 </a>
                             {% endfor %}
                             <a class="category" href="/news?c=all" style="font-size: 12px"> all </a>
