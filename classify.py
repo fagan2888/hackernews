@@ -132,11 +132,13 @@ def classify_hn_top_posts():
         response[i:i+20]
         for i in xrange(0, len(response), 20)
     ]
+
+    # Proccess each chunk in its own thread
     threads = []
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks):
         t = threading.Thread(
             target=get_unclassified_posts,
-            args=(chunk, unclassified_hn_posts,)
+            args=(chunk, unclassified_hn_posts, i,)
         )
         threads.append(t)
         t.start()
