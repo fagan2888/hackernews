@@ -27,7 +27,8 @@ def get_link_content(link):
         # Extract text from p, div and span elements
         texts = root.xpath("//p/text()")\
             + root.xpath("//div/text()")\
-            + root.xpath("//span/text()")
+            + root.xpath("//span/text()")\
+            + root.xpath("//pre/text()")
         content = " ".join(texts)
         content = content.strip()
     except:
