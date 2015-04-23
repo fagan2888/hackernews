@@ -1,5 +1,5 @@
 praw==2.1.21
-requests==2.5.3
+requests
 lxml==3.4.2
 hackernews-python==0.3.2
 Flask==0.10.1
