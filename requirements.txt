@@ -1,0 +1,9 @@
+praw==2.1.21
+requests==2.5.3
+lxml==3.4.2
+hackernews-python==0.3.2
+Flask==0.10.1
+Flask-Bootstrap==3.3.2.1
+Flask-Moment==0.4.0
+pymongo==3.0
+python-firebase==1.2
