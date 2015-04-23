@@ -7,7 +7,6 @@ from firebase import firebase
 from flask import Flask, render_template, request
 from flask.ext.moment import Moment
 from flask_bootstrap import Bootstrap
-from hackernews import HackerNews
 from pymongo import MongoClient
 from time import sleep
 from utils import get_link_content, CATEGORIES
@@ -25,8 +24,6 @@ COLORS = [
 app = Flask(__name__)
 Bootstrap(app)
 moment = Moment(app)
-
-hn = HackerNews()
 
 mongo = MongoClient()
 db = mongo.hn_demo
@@ -64,7 +61,7 @@ def get_hn_post(postId):
     t = 1
     while(not result and t < MAX_RETRIES):
         try:
-            result = hn.item(postId)
+            result = firebase.get('/v0/item/%s' % postId, None)
         except:
             ++t
             sleep(5)
