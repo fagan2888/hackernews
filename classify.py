@@ -78,13 +78,13 @@ def update_post(old_post, new_post, ranking):
         posts.update({'ranking': ranking}, {'$set': {'ranking': None}})
 
     # Update post comments count
-    if hasattr(new_post, 'descendants')\
-       and old_post['ranking'] != new_post.descendants:
-        update['$set']['comments'] = new_post.descendants
+    if 'descendants' in new_post\
+       and old_post['ranking'] != new_post['descendants']:
+        update['$set']['comments'] = new_post['descendants']
 
     # Update post score
-    if old_post['score'] != new_post.score:
-        update['$set']['score'] = new_post.score
+    if old_post['score'] != new_post['score']:
+        update['$set']['score'] = new_post['score']
 
     if update['$set']:
         print('Updated: ' + old_post['url'])
@@ -99,21 +99,21 @@ def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
         new_post = get_hn_post(postId)
         if not old_post:
             if new_post and hasattr(new_post, 'url'):
-                text = get_link_content(new_post.url)
+                text = get_link_content(new_post['url'])
                 if text:
-                    print(new_post.url)
+                    print(new_post['url'])
                     post_data = {
                         'id': postId,
-                        'url': new_post.url,
-                        'title': new_post.title,
+                        'url': new_post['url'],
+                        'title': new_post['title'],
                         'text': text,
-                        'time': new_post.time,
-                        'score': new_post.score,
-                        'username': new_post.by,
+                        'time': new_post['time'],
+                        'score': new_post['score'],
+                        'username': new_post['by'],
                         'ranking': ranking
                     }
-                    if hasattr(new_post, 'descendants'):
-                        post_data['comments'] = new_post.descendants
+                    if 'descendants'in new_post:
+                        post_data['comments'] = new_post['descendants']
 
                     unclassified_hn_posts.append(post_data)
         else:
@@ -149,7 +149,7 @@ def classify_hn_top_posts():
 
     # Match results with its post
     for i, post in enumerate(unclassified_hn_posts):
-        if result[i][0]['probability'] > 0.6:
+        if result[i][0]['probability'] > 0.5:
             post['result'] = result[i][0]
         else:
             post['result'] = {
