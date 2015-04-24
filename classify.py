@@ -99,7 +99,7 @@ def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
         old_post = posts.find_one({'id': postId})
         new_post = get_hn_post(postId)
         if not old_post:
-            if new_post and hasattr(new_post, 'url'):
+            if new_post and 'url' in new_post:
                 text = get_link_content(new_post['url'])
                 if text:
                     print(new_post['url'])
