@@ -1,5 +1,9 @@
 {% extends "bootstrap/base.html" %}
 
+{% block title %}
+  Hacker News by MonkeyLearn
+{% endblock %}
+
 {% block head %}
     {{super()}}
     <link rel="stylesheet" href="/static/css/main.css">
@@ -71,7 +75,7 @@
     <!-- Navigation -->
     <nav class="container navbar-inverse navbar-fixed-top header-container" role="navigation">
         <div class="navbar-header header">
-            <a class="navbar-brand title" href="/">
+            <a class="navbar-brand title" href="http://www.monkeylearn.com/">
                 <div class="logo"></div>
                 <div class="text"> 
                     Hackernews <small> by Monkeylearn </small>
