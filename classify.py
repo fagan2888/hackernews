@@ -103,12 +103,14 @@ def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
                 text = get_link_content(new_post['url'])
                 if text:
                     print(new_post['url'])
+                    time = datetime.datetime\
+                        .fromtimestamp(new_post['time']/1e3)
                     post_data = {
                         'id': postId,
                         'url': new_post['url'],
                         'title': new_post['title'],
                         'text': text,
-                        'time': new_post['time'],
+                        'time': time,
                         'score': new_post['score'],
                         'username': new_post['by'],
                         'ranking': ranking
