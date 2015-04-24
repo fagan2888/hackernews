@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import requests
 import threading
 
@@ -25,8 +26,8 @@ app = Flask(__name__)
 Bootstrap(app)
 moment = Moment(app)
 
-mongo = MongoClient()
-db = mongo.hn_demo
+mongo = MongoClient(os.environ.get('MONGO_URL', None))
+db = mongo[os.environ.get('MONGO_DB', 'hn_demo')]
 posts = db.posts
 
 firebase = firebase.FirebaseApplication(
