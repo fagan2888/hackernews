@@ -104,7 +104,7 @@ def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
                 if text:
                     print(new_post['url'])
                     time = datetime.datetime\
-                        .fromtimestamp(new_post['time']/1e3)
+                        .fromtimestamp(int(new_post['time']))
                     post_data = {
                         'id': postId,
                         'url': new_post['url'],
