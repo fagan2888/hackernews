@@ -7,24 +7,48 @@
 }
 
 .header-container .header {
-    margin-top: -12px
+    margin-top: -12px;
+    width: 100%;
 }
 
 .header-container .header .title {
-    color: black; 
-    font-size: 15px;
+    width: 100%;
+    padding-left: 0px;
+    padding-right: 0px;
+    line-height: 12pt; 
+    height:10px;
 }
 
-.header-container .header .title .logo {
+.header-container .header .title a {
+    color: black !important; 
+    font-size: 15px;
+    font-weight: bold;
+    font-size: 10pt;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+.header-container .header .title .logo-monkeylearn {
     background: url('/static/images/logo.png') repeat scroll 0% 0% / contain transparent;
     position: relative;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     display: inline-block;
-    margin-left: -20px;
+    vertical-align: bottom;
+    top: 2px;
 }
 
-.header-container .header .title .text {
+.header-container .header .title .logo-hackernews {
+    background: url('/static/images/hackernews.gif') repeat scroll 0% 0% / contain transparent;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border: 1px #ffffff solid;
+    vertical-align: bottom;
+    top: 2px;
+}
+
+.header-container .header .title .left {
     font-size: 17px;
     position: relative;
     top: -5px;

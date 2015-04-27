@@ -6,6 +6,7 @@
 
 {% block head %}
     {{super()}}
+    <link rel="shortcut icon" sizes="16x16 24x24 32x32 48x48 64x64" href="/static/images/hackernews.gif">
     <link rel="stylesheet" href="/static/css/main.css">
     {{ moment.include_jquery() }}
     {{ moment.include_moment() }}
@@ -75,12 +76,20 @@
     <!-- Navigation -->
     <nav class="container navbar-inverse navbar-fixed-top header-container" role="navigation">
         <div class="navbar-header header">
-            <a class="navbar-brand title" href="http://www.monkeylearn.com/">
-                <div class="logo"></div>
-                <div class="text"> 
-                    Hackernews <small> by Monkeylearn </small>
+            <div class="navbar-brand title">
+                <div class="title">
+                    <a class="pull-left" href="/">
+                        M
+                        <div class="logo-hackernews"></div>
+                        Hacker News
+                     </a> 
+                    <a class="pull-right" target='_blank' href="https://blog.monkeylearn.com/hacker-news-categorizer-with-monkeylearn/">
+                        Made by
+                        <div class="logo-monkeylearn"></div>
+                        MonkeyLearn
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </nav>
 {% endblock %}
