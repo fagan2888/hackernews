@@ -35,6 +35,11 @@ firebase = firebase.FirebaseApplication(
     authentication=None
 )
 
+if 'MONKEYLEARN_APIKEY' in os.environ:
+    MONKEYLEARN_TOKEN = 'token %s' % os.environ.get('MONKEYLEARN_APIKEY')
+else:
+    raise Exception("Monkeylearn token is required")
+
 
 def classify(posts):
     if not posts:
@@ -46,7 +51,7 @@ def classify(posts):
             'text_list': posts
         }),
         headers={
-            'Authorization': 'Token e13b268ec3c09712b7869c21103923dfd7a31309',
+            'Authorization': MONKEYLEARN_TOKEN,
             'Content-Type': 'application/json'
         })
 
