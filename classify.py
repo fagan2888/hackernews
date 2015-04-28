@@ -40,6 +40,8 @@ if 'MONKEYLEARN_APIKEY' in os.environ:
 else:
     raise Exception("Monkeylearn token is required")
 
+google_analytics_key = os.environ.get('GOOGLE_ANALYTICS_KEY', None)
+
 
 def classify(posts):
     if not posts:
@@ -239,7 +241,8 @@ def index():
         statistics=get_statistics(),
         categories=CATEGORIES + ['random'],
         page=page,
-        category=category
+        category=category,
+        google_analytics_key=google_analytics_key
     )
 
 
