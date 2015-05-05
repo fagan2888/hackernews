@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>MyHackerNews {{category}}</title>
+    <description>Hacker News posts in the {{category}} category</description>
+    <link>http://hackernews.demos.monkeylearn.com/feed.rss?c={{category}}</link>
+    <lastBuildDate></lastBuildDate>
+    <pubDate></pubDate>
+    <ttl>1800</ttl>
+    {% for post in posts %}
+      <item>
+        <title>{{post.title}}</title>
+        <description>{{post.score}} points by {{post.username}}</description>
+        <link>{{post.url}}</link>
+        <guid isPermaLink="true">{{post.url}}</guid>
+        <pubDate>{{post.time}}</pubDate>
+      </item>
+    {% endfor %}
+  </channel>
+</rss>
