@@ -29,8 +29,8 @@ def get_link_content(link):
             + root.xpath("//div/text()")\
             + root.xpath("//span/text()")\
             + root.xpath("//pre/text()")
-        content = " ".join(texts)
-        content = content.strip()
+        content = " ".join([text.strip() for text in texts])
+        print content
     except:
         content = None
 
