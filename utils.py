@@ -6,7 +6,7 @@ CATEGORIES = [
     'programming',
     'business',
     'design',
-    'entertaiment',
+    'entertainment',
     'science',
     'security',
     'worldnews'

@@ -68,7 +68,7 @@
                     {% endfor %}
                 ]
             });
-        });            
+        });
     </script>
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -91,7 +91,7 @@
                         M
                         <div class="logo-hackernews"></div>
                         Hacker News
-                     </a> 
+                     </a>
                     <a class="pull-right" target='_blank' href="https://blog.monkeylearn.com/hacker-news-categorizer-with-monkeylearn/">
                         Made by
                         <div class="logo-monkeylearn"></div>
@@ -110,12 +110,12 @@
             <div class="col-lg-12">
                 <div id="chart"></div>
 
-                <div class="list-container"> 
-                    <div class="header"> 
+                <div class="list-container">
+                    <div class="header">
                         Top news
                         <div class="pull-right">
                             {% for c in categories %}
-                                <a class="category" href="/news?c={{c}}">{{c}} | 
+                                <a class="category" href="/news?c={{c}}">{{c}} |
                                 </a>
                             {% endfor %}
                             <a class="category" href="/news?c=all" style="font-size: 12px"> all </a>
@@ -128,27 +128,27 @@
                                 <div class="category">
                                     <span class="label label-primary" data-toggle="modal" data-target="#{{post.id}}"
                                         {% for c in categories %}
-                                            {% if post.result.label == c %} 
+                                            {% if post.result.label == c %}
                                                 style="background-color:{{statistics.colors[loop.index0]}}"
                                             {% endif %}
-                                        {% endfor %}> 
-                                        {{post.result.label}} 
+                                        {% endfor %}>
+                                        {{post.result.label}}
                                         {% if post.result.label != 'random' %}
                                             ({{post.result.probability}})
                                         {% endif %}
                                     </span>
                                 </div>
                                 <p>
-                                    <small> 
-                                        {{post.score}} points by {{post.username}} 
+                                    <small>
+                                        {{post.score}} points by {{post.username}}
                                         {{moment(post.time).fromNow()}}
                                         |
                                         <a href="https://news.ycombinator.com/item?id={{post.id}}" target="_blank">
-                                            {{post.comments}} comments 
+                                            {{post.comments}} comments
                                         </a>
                                     </small>
                                 </p>
-                                
+
                                 <!-- Modal -->
                                 <div class="modal fade" id="{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                   <div class="modal-dialog">
@@ -160,19 +160,19 @@
                                             {% if post.result.label == 'random' %}
                                                 <span class="label label-primary"
                                                     {% for c in categories %}
-                                                        {% if post.original_result.label == c %} 
+                                                        {% if post.original_result.label == c %}
                                                             style="background-color:{{statistics.colors[loop.index0]}}"
                                                         {% endif %}
-                                                    {% endfor %}> 
+                                                    {% endfor %}>
                                                     {{post.original_result.label}} ({{post.original_result.probability}})
                                                 </span>
                                             {% else %}
                                                 <span class="label label-primary"
                                                     {% for c in categories %}
-                                                        {% if post.result.label == c %} 
+                                                        {% if post.result.label == c %}
                                                             style="background-color:{{statistics.colors[loop.index0]}}"
                                                         {% endif %}
-                                                    {% endfor %}> 
+                                                    {% endfor %}>
                                                     {{post.result.label}} ({{post.result.probability}})
                                                 </span>
                                             {% endif %}
