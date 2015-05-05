@@ -242,6 +242,24 @@ def index():
         category=category
     )
 
+@app.route('/feed.xml', methods=['GET'])
+def category_rss():
+    category = request.args.get('c')
+    page = 1
+
+    selector = {'ranking': {'$ne': None}}
+    if category != 'all':
+        selector['result.label'] = category
+    else:
+        category = 'all'
+
+    return render_template(
+        'category_rss.xml',
+        posts=posts.find(selector).sort('ranking', 1)
+                   .skip((page-1)*LIMIT).limit(LIMIT),
+        category=category
+    )
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
