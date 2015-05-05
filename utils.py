@@ -30,7 +30,6 @@ def get_link_content(link):
             + root.xpath("//span/text()")\
             + root.xpath("//pre/text()")
         content = " ".join([text.strip() for text in texts])
-        print content
     except:
         content = None
 
