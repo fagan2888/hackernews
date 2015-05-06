@@ -18,58 +18,105 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script type="text/javascript">
-        $(function () {
-            var colors = [
-                {% for color in statistics.colors %}
-                    '{{color}}',
-                {% endfor %}
-            ];
-            var time_intervals = [
-                {% for interval in statistics.time_intervals %}
-                    '{{interval.0.strftime("%H")}}',
-                {% endfor %}
-            ];
+     function supportsLocalStorage() {
+         try {
+             return 'localStorage' in window && window['localStorage'] !== null;
+         } catch (e) {
+             return false;
+         }
+     };
 
-            $('#chart').highcharts({
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Top news categories',
-                    x: -20 //center
-                },
-                xAxis: {
-                    categories: time_intervals
-                },
-                yAxis: {
-                    title: {
-                        text: 'Number of posts'
-                    },
-                    plotLines: [{
-                        value: 0,
-                        width: 1,
-                        color: '#808080'
-                    }],
-                    tickInterval: 1
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle',
-                    borderWidth: 0
-                },
-                colors: colors,
-                series: [
-                {% for cat in categories %}
-                    {
-                        name: '{{cat}}',
-                        data: {{statistics.data[cat]}},
-                        visible: {% if category == 'all' or category == cat %} true {% else %} false {% endif %}
-                    },
-                    {% endfor %}
-                ]
-            });
-        });
+     function chartHidden() {
+         if (supportsLocalStorage()) {
+             return localStorage.getItem('hide_chart') == 'true';
+         }
+     };
+
+     function toggleChart() {
+         if (supportsLocalStorage()) {
+             localStorage.setItem('hide_chart', !chartHidden());
+         }
+     };
+
+     function hideShowChart() {
+         if (chartHidden()) {
+             $('#chart').hide();
+         } else {
+             $('#chart').show();
+         }
+     };
+
+     function changeButtonText() {
+         if (chartHidden()) {
+             $('#chart-toggle').text('Show chart');
+         } else {
+             $('#chart-toggle').text('Hide chart');
+         }
+     };
+
+     $('#chart-toggle').click(function() {
+         toggleChart();
+         hideShowChart();
+         changeButtonText();
+     });
+
+     $(function () {
+         var colors = [
+             {% for color in statistics.colors %}
+             '{{color}}',
+             {% endfor %}
+         ];
+         var time_intervals = [
+             {% for interval in statistics.time_intervals %}
+             '{{interval.0.strftime("%H")}}',
+             {% endfor %}
+         ];
+
+         $('#chart').highcharts({
+             chart: {
+                 type: 'column'
+             },
+             title: {
+                 text: 'Top news categories',
+                 x: -20 //center
+             },
+             xAxis: {
+                 title: {
+                     text: 'Hour'
+                 },
+                 categories: time_intervals
+             },
+             yAxis: {
+                 title: {
+                     text: 'Number of posts'
+                 },
+                 plotLines: [{
+                     value: 0,
+                     width: 1,
+                     color: '#808080'
+                 }],
+                 tickInterval: 1
+             },
+             legend: {
+                 layout: 'vertical',
+                 align: 'right',
+                 verticalAlign: 'middle',
+                 borderWidth: 0
+             },
+             colors: colors,
+             series: [
+                 {% for cat in categories %}
+                     {
+                         name: '{{cat}}',
+                         data: {{statistics.data[cat]}},
+                         visible: {% if category == 'all' or category == cat %} true {% else %} false {% endif %}
+                     },
+                 {% endfor %}
+             ]
+         });
+         hideShowChart();
+         changeButtonText();
+     });
     </script>
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -114,6 +161,7 @@
                 <div class="list-container">
                     <div class="header">
                         Top news
+                        <a id="chart-toggle"></a>
                         <div class="pull-right">
                             {% for c in categories %}
                                 <a class="category" href="/news?c={{c}}">{{c}}</a>

@@ -215,17 +215,20 @@ def get_statistics():
     }
 
 
+def search_posts(category, page):
+    selector = {'ranking': {'$ne': None}}
+    if category and category != 'all':
+        selector['result.label'] = category
+
+    return posts.find(selector).sort('ranking', 1)\
+                .skip((page-1)*LIMIT).limit(LIMIT)
+
+
 @app.route('/', methods=['GET'])
 @app.route('/news', methods=['GET'])
 def index():
     page = request.args.get('p')
-    category = request.args.get('c')
-
-    selector = {'ranking': {'$ne': None}}
-    if category and category != 'all':
-        selector['result.label'] = category
-    else:
-        category = 'all'
+    category = request.args.get('c') or 'all'
 
     if not page:
         page = 1
@@ -234,29 +237,22 @@ def index():
 
     return render_template(
         'index.html',
-        posts=posts.find(selector).sort('ranking', 1)
-                   .skip((page-1)*LIMIT).limit(LIMIT),
+        posts=search_posts(category, page),
         statistics=get_statistics(),
         categories=CATEGORIES + ['random'],
         page=page,
         category=category
     )
 
+
 @app.route('/feed.xml', methods=['GET'])
 def category_rss():
-    category = request.args.get('c')
+    category = request.args.get('c') or 'all'
     page = 1
-
-    selector = {'ranking': {'$ne': None}}
-    if category != 'all':
-        selector['result.label'] = category
-    else:
-        category = 'all'
 
     return render_template(
         'category_rss.xml',
-        posts=posts.find(selector).sort('ranking', 1)
-                   .skip((page-1)*LIMIT).limit(LIMIT),
+        posts=search_posts(category, page),
         category=category
     )
 
