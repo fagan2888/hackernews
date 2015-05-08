@@ -7,7 +7,6 @@ import threading
 from firebase import firebase
 from flask import Flask, render_template, request
 from flask.ext.moment import Moment
-from flask_bootstrap import Bootstrap
 from pymongo import MongoClient
 from time import sleep
 from utils import get_link_content, CATEGORIES
@@ -23,7 +22,6 @@ COLORS = [
 ]
 
 app = Flask(__name__)
-Bootstrap(app)
 moment = Moment(app)
 
 mongo = MongoClient(os.environ.get('MONGO_URL', None))
@@ -222,6 +220,14 @@ def search_posts(category, page):
 
     return posts.find(selector).sort('ranking', 1)\
                 .skip((page-1)*LIMIT).limit(LIMIT)
+
+
+def search_categories(categories, page):
+    result = []
+    for category in categories:
+        result += [search_posts(category_page)]
+
+    return result
 
 
 @app.route('/', methods=['GET'])

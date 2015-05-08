@@ -1,31 +1,4 @@
-/*** HEADER ***/
-.header-container {
-    background-color: rgb(255, 102, 0); 
-    border-color: rgb(192, 77, 0);
-    height: 30px;
-    margin-top: 10px;
-}
-
-.header-container .header {
-    margin-top: -12px;
-    width: 100%;
-}
-
-.header-container .header .title {
-    width: 100%;
-    padding-left: 0px;
-    padding-right: 0px;
-    line-height: 12pt; 
-    height:10px;
-}
-
-.header-container .header .title a {
-    color: black !important; 
-    font-size: 15px;
-    font-weight: bold;
-    font-size: 10pt;
-    font-family: Verdana, Geneva, sans-serif;
-}
+/* Logos */
 
 .header-container .header .title .logo-monkeylearn {
     background: url('/static/images/logo.png') repeat scroll 0% 0% / contain transparent;
@@ -46,38 +19,4 @@
     border: 1px #ffffff solid;
     vertical-align: bottom;
     top: 2px;
-}
-
-.header-container .header .title .left {
-    font-size: 17px;
-    position: relative;
-    top: -5px;
-    display: inline-block;
-    font-weight: 500;
-}
-
-/*** CHART ***/
-
-
-/*** LIST ***/
-.list-container .header {
-    font-size: 20px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    border-bottom: 1px solid rgb(204, 204, 204);
-}
-
-.list-container .header .category {
-    font-size: 12px
-}
-
-.list-container .list .item .category {
-    display: initial;
-    margin-left: 5px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.category-rss {
-    font-size: 10px;
 }
