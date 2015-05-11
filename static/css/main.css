@@ -6,6 +6,25 @@
   box-sizing: border-box;
 }
 
+/* Link style */
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    color: #3498db;
+}
+
+a:visited {
+    color: #3498db;
+}
+
+a:hover {
+    color: #3498db;
+}
+
+
 /* Navbar */
 
 nav {
@@ -23,6 +42,10 @@ nav .logo {
 
 nav .ml-link {
     float: right;
+}
+
+nav a:link, nav a:visited, nav a:hover {
+    color: #222;
 }
 
 /* Logos */
