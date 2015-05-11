@@ -70,3 +70,40 @@ nav a:link, nav a:visited, nav a:hover {
     vertical-align: center;
     top: 2px;
 }
+
+/* Main posts list */
+
+main {
+    width: 60%;
+    margin: 0 auto;
+    padding: 25px;
+
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+main header {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #333;
+}
+
+main header .category-list {
+    list-style-type: none;
+}
+
+main header .category-list li {
+    display: inline-block;
+}
+
+main .more {
+    font-weight: bold;
+    display: block;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Modal style */
+
+.modal {
+    display: none;
+}

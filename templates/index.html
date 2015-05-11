@@ -131,8 +131,8 @@
 
 {% block content %}
   <!-- Page Content -->
+  <div id="chart"></div>
   <main>
-    <div id="chart"></div>
     <header>
       Top news
       <a id="chart-toggle"></a>
@@ -196,7 +196,7 @@
           </div>
         </div>
       {% endfor %}
-      <a href="/news?p={{page+1}}&c={{category}}">More</a>
+      <a class="more" href="/news?p={{page+1}}&c={{category}}">More</a>
     </div>
   </main>
 {% endblock %}
