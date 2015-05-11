@@ -1,6 +1,31 @@
+*, *:after, *:before {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Navbar */
+
+nav {
+    height: 40px;
+    line-height: 40px;
+
+    background-color: #ff6600;
+}
+
+nav .logo {
+    float: left;
+}
+
+nav .ml-link {
+    float: right;
+}
+
 /* Logos */
 
-.header-container .header .title .logo-monkeylearn {
+.logo-monkeylearn {
     background: url('/static/images/logo.png') repeat scroll 0% 0% / contain transparent;
     position: relative;
     width: 20px;
@@ -10,7 +35,7 @@
     top: 2px;
 }
 
-.header-container .header .title .logo-hackernews {
+.logo-hackernews {
     background: url('/static/images/hackernews.gif') repeat scroll 0% 0% / contain transparent;
     position: relative;
     width: 20px;
