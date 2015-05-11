@@ -130,105 +130,73 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Page Content -->
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div id="chart"></div>
+  <!-- Page Content -->
+  <main>
+    <div id="chart"></div>
+    <header>
+      Top news
+      <a id="chart-toggle"></a>
+      <ul class="category-list">
+        {% for c in categories %}
+          <li class="category">
+            <a class="category-link" href="/news?c={{c}}">{{c}}</a>
+            <a class="category-rss" href="/feed.xml?c={{c}}">
+              <i class="fa fa-rss"></i>
+            </a>
+          </li>
+        {% endfor %}
+        <li class="category">
+          <a class="category-link" href="/news?c=all"> all </a>
+          <a class="category-rss" href="/feed.xml?c=all">
+            <i class="fa fa-rss"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+    <div class="posts">
+      {% for post in posts %}
+        <div class="post">
+          <a href="{{post.url}}" >{{post.ranking}}.  {{post.title}} </a>
+          <div class="category">
+            {% include "label_primary.html" %}
+          </div>
+          <p>
+            <small>
+              {{post.score}} points by {{post.username}}
+              {{moment(post.time).fromNow()}}
+              |
+              <a href="https://news.ycombinator.com/item?id={{post.id}}" target="_blank">
+                {{post.comments}} comments
+              </a>
+            </small>
+          </p>
 
-                <div class="list-container">
-                    <div class="header">
-                        Top news
-                        <a id="chart-toggle"></a>
-                        <div class="pull-right">
-                            {% for c in categories %}
-                                <a class="category" href="/news?c={{c}}">{{c}}</a>
-                                <a class="category-rss" href="/feed.xml?c={{c}}">
-                                  <i class="fa fa-rss"></i>
-                                </a>
-                                |
-                            {% endfor %}
-                            <a class="category" href="/news?c=all"> all </a>
-                            <a class="category-rss" href="/feed.xml?c=all">
-                              <i class="fa fa-rss"></i>
-                            </a>
-                        </div>
-                     </div>
-                    <div class="list">
-                        {% for post in posts %}
-                            <div class="item">
-                                <a href="{{post.url}}" >{{post.ranking}}.  {{post.title}} </a>
-                                <div class="category">
-                                    <span class="label label-primary" data-toggle="modal" data-target="#{{post.id}}"
-                                        {% for c in categories %}
-                                            {% if post.result.label == c %}
-                                                style="background-color:{{statistics.colors[loop.index0]}}"
-                                            {% endif %}
-                                        {% endfor %}>
-                                        {{post.result.label}}
-                                        {% if post.result.label != 'random' %}
-                                            ({{post.result.probability}})
-                                        {% endif %}
-                                    </span>
-                                </div>
-                                <p>
-                                    <small>
-                                        {{post.score}} points by {{post.username}}
-                                        {{moment(post.time).fromNow()}}
-                                        |
-                                        <a href="https://news.ycombinator.com/item?id={{post.id}}" target="_blank">
-                                            {{post.comments}} comments
-                                        </a>
-                                    </small>
-                                </p>
-
-                                <!-- Modal -->
-                                <div class="modal fade" id="{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title" id="myModalLabel">
-                                            Extracted text
-                                            {% if post.result.label == 'random' %}
-                                                <span class="label label-primary"
-                                                    {% for c in categories %}
-                                                        {% if post.original_result.label == c %}
-                                                            style="background-color:{{statistics.colors[loop.index0]}}"
-                                                        {% endif %}
-                                                    {% endfor %}>
-                                                    {{post.original_result.label}} ({{post.original_result.probability}})
-                                                </span>
-                                            {% else %}
-                                                <span class="label label-primary"
-                                                    {% for c in categories %}
-                                                        {% if post.result.label == c %}
-                                                            style="background-color:{{statistics.colors[loop.index0]}}"
-                                                        {% endif %}
-                                                    {% endfor %}>
-                                                    {{post.result.label}} ({{post.result.probability}})
-                                                </span>
-                                            {% endif %}
-                                        </h4>
-                                      </div>
-                                      <div class="modal-body">
-                                        {{post.text}}
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <a href="/news?p={{page+1}}&c={{category}}">More</a>
+          <div class="modal" id="{{post.id}}">
+            <h4 class="modal-title">
+              Extracted text
+              {% if post.result.label == 'random' %}
+                <span class="label label-primary"
+                      {% for c in categories %}
+                      {% if post.original_result.label == c %}
+                      style="background-color:{{statistics.colors[loop.index0]}}"
+                      {% endif %}
+                      {% endfor %}>
+                  {{post.original_result.label}} ({{post.original_result.probability}})
+                </span>
+              {% else %}
+                {% include "label_primary.html" %}
+              {% endif %}
+            </h4>
+            <div class="modal-body">
+              {{post.text}}
             </div>
+            <div class="modal-footer">
+              <button class="button-close">Close</button>
+            </div>
+          </div>
         </div>
-        <!-- /.row -->
+      {% endfor %}
+      <a href="/news?p={{page+1}}&c={{category}}">More</a>
     </div>
-    <!-- /.container -->
+  </main>
 {% endblock %}
