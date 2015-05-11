@@ -6,6 +6,12 @@
   box-sizing: border-box;
 }
 
+/* Font style */
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 /* Link style */
 
 a {
@@ -13,15 +19,15 @@ a {
 }
 
 a:link {
-    color: #3498db;
+    color: #2980b9;
 }
 
 a:visited {
-    color: #3498db;
+    color: #2980b9;
 }
 
 a:hover {
-    color: #3498db;
+    color: #2980b9;
 }
 
 
@@ -52,23 +58,17 @@ nav a:link, nav a:visited, nav a:hover {
 
 .logo-monkeylearn {
     background: url('/static/images/logo.png') repeat scroll 0% 0% / contain transparent;
-    position: relative;
     width: 20px;
     height: 20px;
     display: inline-block;
-    vertical-align: center;
-    top: 2px;
 }
 
 .logo-hackernews {
     background: url('/static/images/hackernews.gif') repeat scroll 0% 0% / contain transparent;
-    position: relative;
     width: 20px;
     height: 20px;
     display: inline-block;
-    border: 1px #ffffff solid;
-    vertical-align: center;
-    top: 2px;
+    border: 1px solid white;
 }
 
 /* Main posts list */
@@ -100,6 +100,26 @@ main .more {
     display: block;
     text-align: center;
     padding: 10px;
+}
+
+/* Posts */
+
+.post {
+    margin-top: 10px;
+}
+
+.post .category {
+    display: inline;
+}
+
+.post .category .label {
+    margin: 0 5px;
+    padding: 3px;
+
+    border: 1px solid #ccc;
+    border-radius: 3px;
+
+    font-size: 12px;
 }
 
 /* Modal style */

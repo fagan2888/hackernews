@@ -175,7 +175,7 @@
             <h4 class="modal-title">
               Extracted text
               {% if post.result.label == 'random' %}
-                <span class="label label-primary"
+                <span class="label"
                       {% for c in categories %}
                       {% if post.original_result.label == c %}
                       style="background-color:{{statistics.colors[loop.index0]}}"
