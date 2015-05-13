@@ -77,13 +77,13 @@ main {
     margin: 25px auto;
     padding: 25px;
 
-    border: 1px solid #333;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
 main header {
     padding-bottom: 20px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #ccc;
 }
 
 main header h1 {
@@ -110,6 +110,10 @@ main .more {
 
 .post {
     margin-top: 10px;
+}
+
+.post:first-child {
+    margin-top: 20px;
 }
 
 .post .category {
