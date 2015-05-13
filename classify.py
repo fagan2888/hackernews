@@ -215,8 +215,12 @@ def get_statistics():
 
 def search_posts(category, page):
     selector = {'ranking': {'$ne': None}}
+
     if category and category != 'all':
-        selector['result.label'] = category
+        if category == 'entertainment':
+            selector['result.label'] = 'entertaiment'
+        else:
+            selector['result.label'] = category
 
     return posts.find(selector).sort('ranking', 1)\
                 .skip((page-1)*LIMIT).limit(LIMIT)
