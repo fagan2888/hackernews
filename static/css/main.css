@@ -132,6 +132,10 @@ main .more {
     margin-top: 10px;
 }
 
+.post:first-child {
+    margin-top: 20px;
+}
+
 .post .category {
     display: inline;
 }
