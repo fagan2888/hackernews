@@ -115,6 +115,8 @@ main header .category-list li:last-child {
 
 main header .category-list i {
     display: block;
+    font-size: 13px;
+    padding-top: 5px;
 }
 
 main .more {
