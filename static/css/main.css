@@ -89,6 +89,8 @@ main header {
 main header h1 {
     display: inline-block;
     font-size: 1.2em;
+
+    margin-bottom: 15px;
 }
 
 main header .category-list {
