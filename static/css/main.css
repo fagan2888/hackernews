@@ -79,6 +79,8 @@ main {
 
     border: 1px solid #ccc;
     border-radius: 4px;
+
+    background: rgb(246, 246, 239);
 }
 
 main header {
