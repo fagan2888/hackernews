@@ -28,7 +28,12 @@
 
      function chartHidden() {
          if (supportsLocalStorage()) {
-             return localStorage.getItem('hide_chart') == 'true';
+             var hidden = localStorage.getItem('hide_chart');
+             if (hidden == undefined) {
+                 return true;
+             } else {
+                 return hidden  == 'true';
+             }
          }
      };
 
