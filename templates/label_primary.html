@@ -1,0 +1,11 @@
+<span class="label"
+      {% for c in categories %}
+      {% if post.result.label == c %}
+      style="background-color:{{statistics.colors[loop.index0]}}"
+      {% endif %}
+      {% endfor %}>
+  {{post.result.label}}
+  {% if post.result.label != 'random' %}
+  ({{post.result.probability}})
+  {% endif %}
+</span>
