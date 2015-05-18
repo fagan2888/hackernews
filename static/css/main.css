@@ -161,3 +161,11 @@ main .more {
 .modal {
     display: none;
 }
+
+/* Chart toggle */
+
+#chart-toggle {
+    float: right;
+    padding: 4px;
+    font-weight: bold;
+}
