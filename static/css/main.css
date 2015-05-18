@@ -162,6 +162,13 @@ main .more {
     display: none;
 }
 
+/* Chart */
+
+#chart {
+    width: 60%;
+    margin: 25px auto;
+}
+
 /* Chart toggle */
 
 #chart-toggle {
