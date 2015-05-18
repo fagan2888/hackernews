@@ -37,7 +37,11 @@ nav {
     line-height: 40px;
 
     background-color: #ff6600;
+}
 
+.navbar {
+    width: 80%;
+    margin: 0 auto;
     padding: 0 35px;
 
     font-weight: bold;
