@@ -60,12 +60,12 @@ def classify(posts):
         raise
 
 
-def get_hn_post(postId):
+def get_hn_post(post_id):
     result = None
     t = 1
     while(not result and t < MAX_RETRIES):
         try:
-            result = firebase.get('/v0/item/%s' % postId, None)
+            result = firebase.get('/v0/item/%s' % post_id, None)
         except:
             ++t
             sleep(5)
