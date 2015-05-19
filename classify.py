@@ -96,11 +96,11 @@ def update_post(old_post, new_post, ranking):
 
 
 def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
-    for i, postId in enumerate(posts_chunk):
+    for i, post_id in enumerate(posts_chunk):
         ranking = chunk_number * 20 + (i + 1)
         # Check if post was already classified
-        old_post = posts.find_one({'id': postId})
-        new_post = get_hn_post(postId)
+        old_post = posts.find_one({'id': post_id})
+        new_post = get_hn_post(post_id)
         if not old_post:
             if new_post and 'url' in new_post:
                 text = get_link_content(new_post['url'])
@@ -109,7 +109,7 @@ def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
                     time = datetime.datetime\
                         .fromtimestamp(int(new_post['time']))
                     post_data = {
-                        'id': postId,
+                        'id': post_id,
                         'url': new_post['url'],
                         'title': new_post['title'],
                         'text': text,
