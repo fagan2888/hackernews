@@ -4,7 +4,7 @@ import threading
 
 from utils import get_link_content
 
-OUTPUTF = 'samples.csv'
+OUTPUT_FILE = 'samples.csv'
 
 REDDIT_CATEGORIES = [
     ('programming', 'machinelearning', 150),
@@ -51,7 +51,7 @@ def get_subreddit_tops(category, limit=100):
 
 
 def save_samples(samples):
-    with open(OUTPUTF, 'w') as csvfile:
+    with open(OUTPUT_FILE, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
         for s in samples:
             writer.writerow([
