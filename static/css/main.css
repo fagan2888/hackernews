@@ -89,7 +89,7 @@ main {
     border: 1px solid #ccc;
     border-radius: 4px;
 
-    background: rgb(246, 246, 239);
+    background: rgba(246, 246, 239, 0.5);
 }
 
 main header {
