@@ -5,24 +5,14 @@ import requests
 import threading
 
 from firebase import firebase
-from flask import Flask, render_template, request
-from flask.ext.moment import Moment
+
 from pymongo import MongoClient
 from time import sleep
-from utils import get_link_content, CATEGORIES
+from utils import get_link_content
 
 
-PORT = 6000
-DEBUG = True
-LIMIT = 30
 MAX_RETRIES = 5
-COLORS = [
-    '#D93B3B', '#7cb5ec', '#90ed7d', '#f7a35c',
-    '#8085e9', '#c015e9', '#2B9658', '#b2b2b2'
-]
 
-app = Flask(__name__)
-moment = Moment(app)
 
 mongo = MongoClient(os.environ.get('MONGO_URL', None))
 db = mongo[os.environ.get('MONGO_DB', 'hn_demo')]
@@ -177,92 +167,5 @@ def classify_hn_top_posts():
 t = threading.Thread(target=classify_hn_top_posts,).start()
 
 
-def get_statistics():
-    data = {}
-
-    # Generate time intervals used to filter posts
-    now = datetime.datetime.now()
-    time_intervals = [(
-        (now-datetime.timedelta(hours=i)).replace(
-            minute=0,
-            second=0,
-            microsecond=0),
-        (now-datetime.timedelta(hours=i-1)).replace(
-            minute=0,
-            second=0,
-            microsecond=0))
-        for i in reversed(range(10))]
-
-    # Get posts count for each category in the time intervals defined
-    for start, end in time_intervals:
-        for category in CATEGORIES + ['random']:
-            if category not in data:
-                data[category] = []
-            data[category].append(posts.find({
-                'time': {
-                    '$gte': start,
-                    '$lte': end
-                },
-                'result.label': category
-            }).count())
-
-    return {
-        'data': data,
-        'time_intervals': time_intervals,
-        'colors': COLORS
-    }
-
-
-def search_posts(category, page):
-    selector = {'ranking': {'$ne': None}}
-
-    if category and category != 'all':
-        selector['result.label'] = category
-
-    return posts.find(selector).sort('ranking', 1)\
-                .skip((page-1)*LIMIT).limit(LIMIT)
-
-
-def search_categories(categories, page):
-    result = []
-    for category in categories:
-        result += [search_posts(category_page)]
-
-    return result
-
-
-@app.route('/', methods=['GET'])
-@app.route('/news', methods=['GET'])
-def index():
-    page = request.args.get('p')
-    category = request.args.get('c') or 'all'
-
-    if not page:
-        page = 1
-    else:
-        page = int(page)
-
-    return render_template(
-        'index.html',
-        posts=search_posts(category, page),
-        statistics=get_statistics(),
-        categories=CATEGORIES + ['random'],
-        page=page,
-        category=category
-    )
-
-
-@app.route('/feed.xml', methods=['GET'])
-def category_rss():
-    category = request.args.get('c') or 'all'
-    page = 1
-
-    return render_template(
-        'category_rss.xml',
-        posts=search_posts(category, page),
-        category=category
-    )
-
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    pass
