@@ -1,7 +1,9 @@
+import os
+import datetime
+
 from flask import Flask, render_template, request
 from flask.ext.moment import Moment
 from flask.ext.pymongo import PyMongo
-
 
 from utils import CATEGORIES
 
@@ -15,10 +17,10 @@ LIMIT = 30
 
 app = Flask(__name__)
 moment = Moment(app)
+# Mongo setup
+# mongodb://mongo:27017/hn_demo
+app.config['MONGO_URI'] = os.environ['MONGO_URI']
 mongo = PyMongo(app)
-
-mongo = MongoClient(os.environ.get('MONGO_URL', None))
-db = mongo[os.environ.get('MONGO_DB', 'hn_demo')]
 
 
 def get_statistics(posts):
@@ -79,8 +81,8 @@ def index():
 
     return render_template(
         'index.html',
-        posts=search_posts(db.posts, category, page),
-        statistics=get_statistics(),
+        posts=search_posts(mongo.db.posts, category, page),
+        statistics=get_statistics(mongo.db.posts),
         categories=CATEGORIES + ['random'],
         page=page,
         category=category
@@ -94,10 +96,10 @@ def category_rss():
 
     return render_template(
         'category_rss.xml',
-        posts=search_posts(db.posts, category, page),
+        posts=search_posts(mongo.db.posts, category, page),
         category=category
     )
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=9000, debug=True)
