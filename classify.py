@@ -126,4 +126,6 @@ def classify_top_posts(max_posts=None):
 
 if __name__ == '__main__':
     max_posts = os.environ.get('HN_MAX_POSTS', None)
+    if max_posts:
+        max_posts = int(max_posts)
     classify_top_posts(max_posts)
