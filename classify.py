@@ -1,268 +1,128 @@
+import os
 import datetime
 import json
-import os
-import requests
 import threading
+from time import sleep
 
 from firebase import firebase
-from flask import Flask, render_template, request
-from flask.ext.moment import Moment
+from monkeylearn import MonkeyLearn
+
 from pymongo import MongoClient
-from time import sleep
-from utils import get_link_content, CATEGORIES
+
+from utils import get_link_content
 
 
-PORT = 6000
-DEBUG = True
-LIMIT = 30
+if 'MONKEYLEARN_APIKEY' not in os.environ:
+    raise Exception("Monkeylearn token is required")
+
 MAX_RETRIES = 5
-COLORS = [
-    '#D93B3B', '#7cb5ec', '#90ed7d', '#f7a35c',
-    '#8085e9', '#c015e9', '#2B9658', '#b2b2b2'
-]
 
-app = Flask(__name__)
-moment = Moment(app)
+MONGO_URI, MONGO_DB = os.environ['MONGO_URI'].rsplit('/', 1)
 
-mongo = MongoClient(os.environ.get('MONGO_URL', None))
-db = mongo[os.environ.get('MONGO_DB', 'hn_demo')]
-posts = db.posts
+MONKEYLEARN_TOKEN = os.environ['MONKEYLEARN_APIKEY']
+MONKEYLEARN_MODULE_ID = 'cl_GLSChuJQ'
 
 firebase = firebase.FirebaseApplication(
     'https://hacker-news.firebaseio.com',
     authentication=None
 )
 
-if 'MONKEYLEARN_APIKEY' in os.environ:
-    MONKEYLEARN_TOKEN = 'token %s' % os.environ.get('MONKEYLEARN_APIKEY')
-else:
-    raise Exception("Monkeylearn token is required")
+db = MongoClient(MONGO_URI)[MONGO_DB]
 
 
-def classify(posts):
-    if not posts:
-        return []
+def update_post(post, cached_post, ranking):
+    update = {'$set': {}}
+    # Update ranking position
+    if cached_post['ranking'] != ranking:
+        update['$set']['ranking'] = ranking
+        # Update ranking of posts that had this position previously
+        db.posts.update({'ranking': ranking}, {'$set': {'ranking': None}})
 
-    response = requests.post(
-        "https://api.monkeylearn.com/v2/classifiers/cl_GLSChuJQ/classify/",
-        data=json.dumps({
-            'text_list': posts
-        }),
-        headers={
-            'Authorization': MONKEYLEARN_TOKEN,
-            'Content-Type': 'application/json'
-        })
+    # Update post comments count
+    if 'descendants' in post\
+       and cached_post['ranking'] != post['descendants']:
+        update['$set']['comments'] = post['descendants']
 
-    try:
-        return json.loads(response.text)['result']
-    except:
-        print("Unexpected result:", json.loads(response.text))
-        raise
+    # Update post score
+    if cached_post['score'] != post['score']:
+        update['$set']['score'] = post['score']
+
+    if update['$set']:
+        db.posts.update({'id': cached_post['id']}, update)
 
 
 def get_hn_post(post_id):
     result = None
-    t = 1
-    while(not result and t < MAX_RETRIES):
+    fail_count = 0
+    while (not result and fail_count <= MAX_RETRIES):
         try:
             result = firebase.get('/v0/item/%s' % post_id, None)
         except:
-            ++t
-            sleep(5)
+            fail_count += 1
+            sleep(2)
             continue
     return result
 
 
-def update_post(old_post, new_post, ranking):
-    update = {'$set': {}}
-    # Update ranking position
-    if old_post['ranking'] != ranking:
-        update['$set']['ranking'] = ranking
-        # Update ranking of posts that had this position previously
-        posts.update({'ranking': ranking}, {'$set': {'ranking': None}})
+def classify_top_posts(max_posts=None):
+    top_posts_ids = firebase.get('/v0/topstories', None)
 
-    # Update post comments count
-    if 'descendants' in new_post\
-       and old_post['ranking'] != new_post['descendants']:
-        update['$set']['comments'] = new_post['descendants']
+    new_posts = []
+    unclassified_rankings = {}
 
-    # Update post score
-    if old_post['score'] != new_post['score']:
-        update['$set']['score'] = new_post['score']
+    for i, post_id in enumerate(top_posts_ids):
+        ranking = i + 1
+        post = get_hn_post(post_id)
+        cached_post = db.posts.find_one({'id': post_id})
 
-    if update['$set']:
-        print('Updated: ' + old_post['url'])
-        posts.update({'id': old_post['id']}, update)
-
-
-def get_unclassified_posts(posts_chunk, unclassified_hn_posts, chunk_number):
-    for i, post_id in enumerate(posts_chunk):
-        ranking = chunk_number * 20 + (i + 1)
-        # Check if post was already classified
-        old_post = posts.find_one({'id': post_id})
-        new_post = get_hn_post(post_id)
-        if not old_post:
-            if new_post and 'url' in new_post:
-                text = get_link_content(new_post['url'])
+        if cached_post:
+            print 'Updating post {}'.format(post_id)
+            update_post(post, cached_post, ranking)
+        else:
+            print 'Adding unclassified post {}'.format(post_id)
+            if post and 'url' in post:
+                text = get_link_content(post['url'])
                 if text:
-                    print(new_post['url'])
-                    time = datetime.datetime\
-                        .fromtimestamp(int(new_post['time']))
                     post_data = {
                         'id': post_id,
-                        'url': new_post['url'],
-                        'title': new_post['title'],
+                        'url': post['url'],
+                        'title': post['title'],
                         'text': text,
-                        'time': time,
-                        'score': new_post['score'],
-                        'username': new_post['by'],
+                        'time': datetime.datetime .fromtimestamp(int(post['time'])),
+                        'score': post['score'],
+                        'username': post['by'],
                         'ranking': ranking
                     }
-                    if 'descendants'in new_post:
-                        post_data['comments'] = new_post['descendants']
+                    if 'descendants'in post:
+                        post_data['comments'] = post['descendants']
 
-                    unclassified_hn_posts.append(post_data)
-        else:
-            update_post(old_post, new_post, ranking)
-
-
-def classify_hn_top_posts():
-    response = firebase.get('/v0/topstories', None)
-    unclassified_hn_posts = []
-
-    # Split response in list of 50 elements
-    chunks = [
-        response[i:i+20]
-        for i in xrange(0, len(response), 20)
-    ]
-
-    # Proccess each chunk in its own thread
-    threads = []
-    for i, chunk in enumerate(chunks):
-        t = threading.Thread(
-            target=get_unclassified_posts,
-            args=(chunk, unclassified_hn_posts, i,)
-        )
-        threads.append(t)
-        t.start()
-
-    # Wait until every chunk was processed
-    for t in threads:
-        t.join()
+                    new_posts.append(post_data)
+                    unclassified_rankings[post_id] = ranking
+        if max_posts and ranking >= max_posts:
+            break
 
     # Classify posts
-    result = classify([p['text'] for p in unclassified_hn_posts])
+    if new_posts:
+        print "Classifying {} post with MonkeyLearn".format(len(new_posts))
+        ml = MonkeyLearn(MONKEYLEARN_TOKEN)
+        result = ml.classifiers.classify(
+            MONKEYLEARN_MODULE_ID,
+            (p['text'] for p in new_posts)
+        ).result
 
-    # Match results with its post
-    for i, post in enumerate(unclassified_hn_posts):
-        if result[i][0]['probability'] > 0.5:
-            post['result'] = result[i][0]
-        else:
-            post['result'] = {
-                'label': 'random',
-                'probability': '--'
-            }
+        # Add classification data to new posts and save to db
+        for i, post in enumerate(new_posts):
+            if result[i][0]['probability'] > 0.5:
+                post['result'] = result[i][0]
+            else:
+                post['result'] = {
+                    'label': 'random',
+                    'probability': '--'
+                }
             post['original_result'] = result[i][0]
 
-        # Check if post was already classified
-        old_post = posts.find_one({'id': post['id']})
-        if not old_post:
-            # Save classified post
-            posts.insert(post)
-
-    # Classify new HN posts again in 5 minutes
-    threading.Timer(300, classify_hn_top_posts).start()
-
-# Start classifing HN post
-t = threading.Thread(target=classify_hn_top_posts,).start()
-
-
-def get_statistics():
-    data = {}
-
-    # Generate time intervals used to filter posts
-    now = datetime.datetime.now()
-    time_intervals = [(
-        (now-datetime.timedelta(hours=i)).replace(
-            minute=0,
-            second=0,
-            microsecond=0),
-        (now-datetime.timedelta(hours=i-1)).replace(
-            minute=0,
-            second=0,
-            microsecond=0))
-        for i in reversed(range(10))]
-
-    # Get posts count for each category in the time intervals defined
-    for start, end in time_intervals:
-        for category in CATEGORIES + ['random']:
-            if category not in data:
-                data[category] = []
-            data[category].append(posts.find({
-                'time': {
-                    '$gte': start,
-                    '$lte': end
-                },
-                'result.label': category
-            }).count())
-
-    return {
-        'data': data,
-        'time_intervals': time_intervals,
-        'colors': COLORS
-    }
-
-
-def search_posts(category, page):
-    selector = {'ranking': {'$ne': None}}
-
-    if category and category != 'all':
-        selector['result.label'] = category
-
-    return posts.find(selector).sort('ranking', 1)\
-                .skip((page-1)*LIMIT).limit(LIMIT)
-
-
-def search_categories(categories, page):
-    result = []
-    for category in categories:
-        result += [search_posts(category_page)]
-
-    return result
-
-
-@app.route('/', methods=['GET'])
-@app.route('/news', methods=['GET'])
-def index():
-    page = request.args.get('p')
-    category = request.args.get('c') or 'all'
-
-    if not page:
-        page = 1
-    else:
-        page = int(page)
-
-    return render_template(
-        'index.html',
-        posts=search_posts(category, page),
-        statistics=get_statistics(),
-        categories=CATEGORIES + ['random'],
-        page=page,
-        category=category
-    )
-
-
-@app.route('/feed.xml', methods=['GET'])
-def category_rss():
-    category = request.args.get('c') or 'all'
-    page = 1
-
-    return render_template(
-        'category_rss.xml',
-        posts=search_posts(category, page),
-        category=category
-    )
+            db.posts.insert(post)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    classify_top_posts()
