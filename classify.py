@@ -82,7 +82,7 @@ def classify_top_posts(max_posts=None):
             print 'Adding unclassified post {}'.format(post_id)
             if post and 'url' in post:
                 text = get_link_content(post['url'])
-                if text:
+                if text and text.strip():
                     post_data = {
                         'id': post_id,
                         'url': post['url'],
