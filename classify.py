@@ -68,42 +68,55 @@ def classify_top_posts(max_posts=None):
     top_posts_ids = firebase.get('/v0/topstories', None)
 
     new_posts = []
-    unclassified_rankings = {}
 
     for i, post_id in enumerate(top_posts_ids):
         ranking = i + 1
         post = get_hn_post(post_id)
         cached_post = db.posts.find_one({'id': post_id})
 
+        print u'#{} Procesing {} ("{}")'.format(ranking, post['id'], post['title'])
+
         if cached_post:
-            print 'Updating post {}'.format(post_id)
+            print '----> Already classified, updating...'
+            # Deleted old posts with same ranking
+            db.posts.delete_many({'ranking': ranking,
+                                  'id': {'$ne': post_id}})
             update_post(post, cached_post, ranking)
         else:
-            print 'Adding unclassified post {}'.format(post_id)
             if post and 'url' in post:
                 text = get_link_content(post['url'])
-                if text and text.strip():
-                    post_data = {
-                        'id': post_id,
-                        'url': post['url'],
-                        'title': post['title'],
-                        'text': text,
-                        'time': datetime.datetime .fromtimestamp(int(post['time'])),
-                        'score': post['score'],
-                        'username': post['by'],
-                        'ranking': ranking
-                    }
-                    if 'descendants'in post:
-                        post_data['comments'] = post['descendants']
+                post_data = {
+                    'id': post_id,
+                    'url': post['url'],
+                    'title': post['title'],
+                    'text': text,
+                    'time': datetime.datetime .fromtimestamp(int(post['time'])),
+                    'score': post['score'],
+                    'username': post['by'],
+                    'ranking': ranking
+		}
+                if 'descendants'in post:
+                    post_data['comments'] = post['descendants']
 
+		if text and text.strip():
+                    # Has good text, queue for classification...
+                    print '----> Queuing for classification...'
                     new_posts.append(post_data)
-                    unclassified_rankings[post_id] = ranking
-        if max_posts and ranking >= max_posts:
+		else:
+                    print '----> Unclassifiable, inserting as random...'
+                    post_data['result'] = {
+			'label': 'random',
+			'probability': '--'
+                    }
+                    post_data['original_result'] = None
+                    db.posts.delete_many({'ranking': post_data['ranking']})
+                    db.posts.insert(post_data)
+	if max_posts and ranking >= max_posts:
             break
 
     # Classify posts
     if new_posts:
-        print "Classifying {} post with MonkeyLearn".format(len(new_posts))
+        print "Classifying {} queued posts with MonkeyLearn".format(len(new_posts))
         ml = MonkeyLearn(MONKEYLEARN_TOKEN)
         result = ml.classifiers.classify(
             MONKEYLEARN_MODULE_ID,
@@ -121,6 +134,8 @@ def classify_top_posts(max_posts=None):
                 }
             post['original_result'] = result[i][0]
 
+            print post['ranking'], post['title']
+            db.posts.delete_many({'ranking': post['ranking']})
             db.posts.insert(post)
 
 
