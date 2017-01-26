@@ -78,9 +78,6 @@ def classify_top_posts(max_posts=None):
 
         if cached_post:
             print '----> Already classified, updating...'
-            # Deleted old posts with same ranking
-            db.posts.delete_many({'ranking': ranking,
-                                  'id': {'$ne': post_id}})
             update_post(post, cached_post, ranking)
         else:
             if post and 'url' in post:
@@ -109,7 +106,6 @@ def classify_top_posts(max_posts=None):
 			'probability': '--'
                     }
                     post_data['original_result'] = None
-                    db.posts.delete_many({'ranking': post_data['ranking']})
                     db.posts.insert(post_data)
 	if max_posts and ranking >= max_posts:
             break
@@ -135,8 +131,10 @@ def classify_top_posts(max_posts=None):
             post['original_result'] = result[i][0]
 
             print post['ranking'], post['title']
-            db.posts.delete_many({'ranking': post['ranking']})
             db.posts.insert(post)
+
+    # Delete old posts
+    db.posts.delete_many({'id': {'$nin': top_posts_ids}})
 
 
 if __name__ == '__main__':
