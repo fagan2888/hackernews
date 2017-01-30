@@ -11,6 +11,7 @@ from pymongo import MongoClient
 
 from utils import get_link_content
 
+import logging
 
 if 'MONKEYLEARN_APIKEY' not in os.environ:
     raise Exception("Monkeylearn token is required")
@@ -64,7 +65,7 @@ def get_hn_post(post_id):
     return result
 
 
-def classify_top_posts(max_posts=None):
+def classify_top_posts(max_posts=None, logger=None):
     top_posts_ids = firebase.get('/v0/topstories', None)
 
     new_posts = []
@@ -74,10 +75,12 @@ def classify_top_posts(max_posts=None):
         post = get_hn_post(post_id)
         cached_post = db.posts.find_one({'id': post_id})
 
-        print u'#{} Procesing {} ("{}")'.format(ranking, post['id'], post['title'])
+        if logger:
+            logger.debug(u'#{} Procesing {} ("{}")'.format(ranking, post['id'], post['title']))
 
         if cached_post:
-            print '----> Already classified, updating...'
+            if logger:
+                logger.debug('----> Already classified, updating...')
             update_post(post, cached_post, ranking)
         else:
             if post and 'url' in post:
@@ -91,28 +94,31 @@ def classify_top_posts(max_posts=None):
                     'score': post['score'],
                     'username': post['by'],
                     'ranking': ranking
-		}
+                }
                 if 'descendants'in post:
                     post_data['comments'] = post['descendants']
 
-		if text and text.strip():
+                if text and text.strip():
                     # Has good text, queue for classification...
-                    print '----> Queuing for classification...'
+                    if logger:
+                        logger.debug('----> Queuing for classification...')
                     new_posts.append(post_data)
-		else:
-                    print '----> Unclassifiable, inserting as random...'
+                else:
+                    if logger:
+                        logger.debug('----> Unclassifiable, inserting as random...')
                     post_data['result'] = {
-			'label': 'random',
-			'probability': '--'
+                'label': 'random',
+                'probability': '--'
                     }
                     post_data['original_result'] = None
                     db.posts.insert(post_data)
-	if max_posts and ranking >= max_posts:
-            break
+                    if max_posts and ranking >= max_posts:
+                        break
 
     # Classify posts
     if new_posts:
-        print "Classifying {} queued posts with MonkeyLearn".format(len(new_posts))
+        if logger:
+            logger.debug("Classifying {} queued posts with MonkeyLearn".format(len(new_posts)))
         ml = MonkeyLearn(MONKEYLEARN_TOKEN)
         result = ml.classifiers.classify(
             MONKEYLEARN_MODULE_ID,
@@ -130,10 +136,11 @@ def classify_top_posts(max_posts=None):
                 }
             post['original_result'] = result[i][0]
 
-            print post['ranking'], post['title']
+            if logger:
+                logger.debug('{} {}',format(post['ranking'], post['title']))
             db.posts.insert(post)
 
-    # Delete old posts
+    # Deleted old posts with same ranking
     db.posts.delete_many({'id': {'$nin': top_posts_ids}})
 
 
@@ -141,4 +148,17 @@ if __name__ == '__main__':
     max_posts = os.environ.get('HN_MAX_POSTS', None)
     if max_posts:
         max_posts = int(max_posts)
-    classify_top_posts(max_posts)
+
+    logfile = max_posts = os.environ.get('HN_LOGFILE', None)
+    if logfile:
+        logger = logging.getLogger('myapp')
+        hdlr = logging.FileHandler(logfile)
+        formatter = logging.Formatter('%(message)s')
+
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger = None
+
+    classify_top_posts(max_posts, logger=logger)
